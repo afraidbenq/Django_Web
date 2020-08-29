@@ -7,6 +7,13 @@
 
 
 #常用命令
+安装卸载
+```
+pip install django
+pip install django==2.2.2
+pip install upgrade django
+pip uninstall django
+```
 查询当前django版本
 ```
 $ python -m django --version
