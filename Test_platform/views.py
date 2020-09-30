@@ -1,29 +1,35 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-from django.template import loader
-from .models import Question
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
+from django.utils import timezone
+from django.views import generic
+
+from .models import Choice, Question
 
 
-def index(request):
-    latest_question_list = Question.objects.order_by('-pub_date')[:5]
-    template = loader.get_template('Test_platform/index.html')
-    context = {
-        'latest_question_list': latest_question_list,
-    }
-    # output = ', '.join([q.question_text for q in latest_question_list])
-    # return HttpResponse(output)
-    # return HttpResponse(template.render(context, request))
-    return render(request, 'Test_platform/index.html', context)
+class IndexView(generic.ListView):
+    template_name = 'Test_platform/index.html'
+    context_object_name = 'latest_question_list'
+
+    def get_queryset(self):
+        """
+        Return the last five published questions (not including those set to be
+        published in the future).
+        """
+        return Question.objects.filter(
+            pub_date__lte=timezone.now()
+        ).order_by('-pub_date')[:5]
 
 
-def detail(request, question_id):
-    return HttpResponse("You're looking at question %s." % question_id)
+class DetailView(generic.DetailView):
+    model = Question
+    template_name = 'Test_platform/detail.html'
 
 
-def results(request, question_id):
-    response = "You're looking at the results of question %s."
-    return HttpResponse(response % question_id)
+class ResultsView(generic.DetailView):
+    model = Question
+    template_name = 'Test_platform/results.html'
 
 
 def vote(request, question_id):
-    return HttpResponse("You're voting on question %s." % question_id)
+    ... # same as above, no changes needed.
